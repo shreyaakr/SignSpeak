@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Gestures with Meanings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .instructions {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item {
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: grab;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .drop-zone {
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            background: #f7f7f7;
+            border: 2px dashed #aaa;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .drop-zone.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .drop-zone.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Match Gestures with Their Meanings</h1>
+        <p class="instructions">Drag the gesture to the matching meaning.</p>
+
+        <div class="match-grid">
+            <!-- Column for gestures -->
+            <div class="column" id="gestures">
+
+                <div class="item" draggable="true" data-gesture="Peace">
+                    <img src="static\images\peace_sign.jpg" alt="Peace">
+                </div>
+
+                <div class="item" draggable="true" data-gesture="Approval">
+                    <img src="static\images\thumbs_up.jpg" alt="Thumbs Up">
+                </div>
+
+                <div class="item" draggable="true" data-gesture="Washroom">
+                    <img src="static\images\washroom.jpeg" alt="Washroom">
+                </div>
+
+                
+                <div class="item" draggable="true" data-gesture="Hello">
+                    <img src="static\images\wave.jpg" alt="Wave">
+                </div>
+               
+                <div class="item" draggable="true" data-gesture="I want to talk">
+                    <img src="static\images\c.jpg" alt="C">
+                </div>
+                
+            </div>
+
+            <!-- Column for meanings -->
+            <div class="column" id="meanings">
+                <div class="drop-zone" data-meaning="Washroom">Washroom</div>
+                <div class="drop-zone" data-meaning="Hello">Hello</div>
+                <div class="drop-zone" data-meaning="I want to talk">I want to talk</div>
+
+              
+                
+                <div class="drop-zone" data-meaning="Approval">Approval</div>
+              
+                <div class="drop-zone" data-meaning="Peace">Peace</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag-and-drop functionality
+        const items = document.querySelectorAll('.item');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        // Add event listeners for draggable items
+        items.forEach(item => {
+            item.addEventListener('dragstart', () => {
+                item.classList.add('dragging');
+            });
+
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+            });
+        });
+
+        // Add event listeners for drop zones
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+
+                const draggingItem = document.querySelector('.dragging');
+                const gesture = draggingItem.getAttribute('data-gesture'); // Gesture from the draggable item
+                const meaning = zone.getAttribute('data-meaning'); // Meaning from the drop zone
+
+                // Compare gesture and meaning
+                if (gesture && meaning) {
+                    if (gesture === meaning) {
+                        zone.textContent = `✅ ${meaning}`;
+                        zone.classList.add('correct');
+                        draggingItem.style.display = "none"; // Hide the matched item
+                        alert("Correct Match!");
+                    } else {
+                        zone.classList.add('wrong');
+                        setTimeout(() => {
+                            zone.classList.remove('wrong');
+                        }, 1000);
+                        alert("Wrong Match!");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

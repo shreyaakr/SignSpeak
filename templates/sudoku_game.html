@@ -1,0 +1,107 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            gap: 5px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        .empty {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .correct {
+            background-color: #d4edda;
+        }
+
+        .wrong {
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sudoku with Gestures</h1>
+        <div class="grid" id="sudoku-grid">
+            {% for row in grid %}
+                {% for cell in row %}
+                    <div 
+                        class="cell {{ 'empty' if cell == 0 else '' }}" 
+                        contenteditable="{{ 'true' if cell == 0 else 'false' }}" 
+                        data-row="{{ loop.index0 }}" 
+                        data-col="{{ loop.index0 }}">{{ cell if cell != 0 else '' }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <p>Use gestures to input numbers!</p>
+    </div>
+
+    <script>
+        const grid = document.getElementById("sudoku-grid");
+
+        grid.addEventListener("blur", async (e) => {
+            const target = e.target;
+            if (target.classList.contains("empty")) {
+                const value = parseInt(target.textContent);
+                const row = target.getAttribute("data-row");
+                const col = target.getAttribute("data-col");
+
+                if (!value || value < 1 || value > 9) {
+                    alert("Please enter a number between 1 and 9!");
+                    target.textContent = "";
+                    return;
+                }
+
+                // Send the data to the backend for validation
+                const response = await fetch("/validate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ row: parseInt(row), col: parseInt(col), value })
+                });
+
+                const result = await response.json();
+                if (result.result === "correct") {
+                    target.classList.add("correct");
+                    alert(result.message);
+                } else {
+                    target.classList.add("wrong");
+                    setTimeout(() => target.classList.remove("wrong"), 1000);
+                    target.textContent = "";
+                    alert(result.message);
+                }
+            }
+        }, true);
+    </script>
+</body>
+</html>  
